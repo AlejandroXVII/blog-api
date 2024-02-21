@@ -14,7 +14,7 @@ const postSchema = new Schema({
 
 postSchema.virtual("url").get(function () {
 	// We don't use an arrow function as we'll need the this object
-	return `/${this._id}`;
+	return `/posts/${this._id}`;
 });
 
 module.exports = mongoose.model("post", postSchema);

@@ -1,13 +1,23 @@
 var createError = require("http-errors");
 var express = require("express");
-var jwt = require("jsonwebtoken");
 var path = require("path");
 var cookieParser = require("cookie-parser");
 var logger = require("morgan");
+require("dotenv").config();
+const mongoose = require("mongoose");
+const bodyParser = require("body-parser");
 
 var indexRouter = require("./routes/index");
 
 var app = express();
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+const mongoDb = process.env.MONGODB_URL;
+mongoose.connect(mongoDb);
+const db = mongoose.connection;
+db.on("error", console.error.bind(console, "mongo connection error"));
 
 app.use(logger("dev"));
 app.use(express.json());
