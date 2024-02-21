@@ -9,7 +9,7 @@ const postSchema = new Schema({
 	content: { type: String, required: true },
 	user: { type: Schema.Types.ObjectId, ref: User },
 	date: { type: Date },
-	comment: [{ type: Schema.Types.ObjectId, ref: Comment }],
+	comment: { type: Schema.Types.ObjectId, ref: Comment },
 });
 
 postSchema.virtual("url").get(function () {
