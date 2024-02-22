@@ -2,6 +2,8 @@ const Post = require("../models/post");
 const Comment = require("../models/comment");
 const asyncHandler = require("express-async-handler");
 const { body, validationResult } = require("express-validator");
+require("dotenv").config();
+var jwt = require("jsonwebtoken");
 
 //GET ALL THE POSTS
 exports.post_list_get = asyncHandler(async (req, res, next) => {
@@ -11,7 +13,7 @@ exports.post_list_get = asyncHandler(async (req, res, next) => {
 //GET ONE POST
 exports.post_get = asyncHandler(async (req, res, next) => {
 	const post = await Post.findById(req.params.id).exec();
-	return res.send(Object.values(post));
+	return res.send(post);
 });
 //POST POST
 exports.post_post = asyncHandler(async (req, res, next) => {
@@ -20,6 +22,10 @@ exports.post_post = asyncHandler(async (req, res, next) => {
 		res.send(400);
 		return;
 	} else {
+		//VERIFY THAT THE USER HAS A VALID TOKEN
+		jwt.verify(req.token, process.env.JWT_KEY, (err) => {
+			if (err) return res.sendStatus(403);
+		});
 		const comment = new Comment({});
 		const commentResult = await comment.save();
 		const post = new Post({
@@ -35,6 +41,11 @@ exports.post_post = asyncHandler(async (req, res, next) => {
 });
 
 exports.post_put = asyncHandler(async (req, res, next) => {
+	//VERIFY THAT THE USER HAS A VALID TOKEN
+	jwt.verify(req.token, process.env.JWT_KEY, (err) => {
+		if (err) return res.sendStatus(403);
+	});
+
 	const errors = validationResult(req);
 
 	const post = new Post({
@@ -53,6 +64,10 @@ exports.post_put = asyncHandler(async (req, res, next) => {
 
 //DELATE POST AND THE COMMENTS
 exports.post_delate = asyncHandler(async (req, res, next) => {
+	//VERIFY THAT THE USER HAS A VALID TOKEN
+	jwt.verify(req.token, process.env.JWT_KEY, (err) => {
+		if (err) return res.sendStatus(403);
+	});
 	const post = await Post.findById(req.params.id).exec();
 	if (post) {
 		await Post.findByIdAndDelete(req.params.id);
